@@ -13,7 +13,8 @@ class JiraServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->mergeConfigFrom(__DIR__.'/../config/laravel-jira.php', 'laravel-jira');
+
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
             \Kaweb\Jira\Exceptions\Handler::class
@@ -27,6 +28,8 @@ class JiraServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->publishes([
+            __DIR__.'/../config/laravel-jira.php' => config_path('laravel-jira.php'),
+        ], 'config');
     }
 }
