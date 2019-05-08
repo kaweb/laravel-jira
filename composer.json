@@ -12,5 +12,17 @@
             "email": "lee@kaweb.co.uk"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Kaweb\\Jira\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kaweb\\Jira\\JiraServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev"
 }
