@@ -4,9 +4,12 @@ namespace Kaweb\Jira\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Console\DetectsApplicationNamespace;
 
 class Handler extends ExceptionHandler
 {
+    use DetectsApplicationNamespace;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -34,7 +37,10 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        parent::report($exception);
+        $className = $this->getAppNamespace() . 'Exceptions\Handler';
+        $handler = new $className($this->container);
+
+        $handler->report($exception);
     }
 
     /**
@@ -46,6 +52,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
+        $className = $this->getAppNamespace() . 'Exceptions\Handler';
+        $handler = new $className($this->container);
+
+        return $handler->render($request, $exception);
     }
 }
