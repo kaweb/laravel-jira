@@ -1,0 +1,16 @@
+{
+    "name": "kaweb/laravel-jira",
+    "description": "Provides integrations to automate processes in Jira",
+    "type": "library",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lee Petryk",
+            "email": "lee@kaweb.co.uk"
+        }
+    ],
+    "minimum-stability": "dev"
+}
