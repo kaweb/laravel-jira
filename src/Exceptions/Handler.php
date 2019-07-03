@@ -38,9 +38,11 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         $className = $this->defaultHandler();
-        $handler = new $className($this->container);
+        if (!empty($className)) {
+            $handler = new $className($this->container);
 
-        $handler->report($exception);
+            $handler->report($exception);
+        }
     }
 
     /**
@@ -53,9 +55,12 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         $className = $this->defaultHandler();
-        $handler = new $className($this->container);
 
-        return $handler->render($request, $exception);
+        if (!empty($className)) {
+            $handler = new $className($this->container);
+
+            return $handler->render($request, $exception);
+        }
     }
 
     /**
@@ -64,14 +69,45 @@ class Handler extends ExceptionHandler
      *
      * @return string
      */
-    protected function defaultHandler()
+    protected function defaultHandler(): string
     {
+        $defaultHandler = '';
+
         if (!empty(config('laravel-jira.exception_handling.default_handler'))) {
-            $nextClass = config('laravel-jira.exception_handling.default_handler');
-        } else {
-            $nextClass = $this->getAppNamespace() . 'Exceptions\Handler';
+            $defaultHandler = config('laravel-jira.exception_handling.default_handler');
         }
 
-        return $nextClass;
+        if (!$this->doesHandlerResolve($defaultHandler)) {
+            $defaultHandler = $this->getAppNamespace() . 'Exceptions\Handler';
+
+            // Check again?
+            if (!$this->doesHandlerResolve($defaultHandler)) {
+                $defaultHandler = '';
+
+                // This is bad, it means that we couldn't resolve a handler to pass the error
+                // to once the error has been raised in Jira it isn't the end of the world
+                // however this means that things like custom error pages, Laravel logging
+                // etc. will not work.
+                // For now I'm going to leave this as is, but need to identify an appropriate
+                // action for this class to carry out if a handler cannot be resolved.
+            }
+        }
+
+        return $defaultHandler;
+    }
+
+    /**
+     * Checks if the handler class string will resole to a PHP class
+     *
+     * @param string $handler The fully namespaced class name
+     *
+     * @return bool
+     */
+    protected function doesHandlerResolve(string $handler): bool
+    {
+        if (!empty($handler) && class_exists($handler)) {
+            return true;
+        }
+        return false;
     }
 }
