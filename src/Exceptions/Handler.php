@@ -59,7 +59,7 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Gets the fully namespaced class name for the next class to be passed on to for
+     * Gets the fully namespaced class name for the next handler to be passed on to for
      * error handling
      *
      * @return string
