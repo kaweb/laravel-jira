@@ -37,7 +37,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        $className = $this->getAppNamespace() . 'Exceptions\Handler';
+        $className = $this->defaultHandler();
         $handler = new $className($this->container);
 
         $handler->report($exception);
@@ -52,9 +52,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        $className = $this->getAppNamespace() . 'Exceptions\Handler';
+        $className = $this->defaultHandler();
         $handler = new $className($this->container);
 
         return $handler->render($request, $exception);
+    }
+
+    /**
+     * Gets the fully namespaced class name for the next class to be passed on to for
+     * error handling
+     *
+     * @return string
+     */
+    protected function defaultHandler()
+    {
+        if (!empty(config('laravel-jira.exception_handling.default_handler'))) {
+            $nextClass = config('laravel-jira.exception_handling.default_handler');
+        } else {
+            $nextClass = $this->getAppNamespace() . 'Exceptions\Handler';
+        }
+
+        return $nextClass;
     }
 }
