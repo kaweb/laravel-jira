@@ -42,5 +42,27 @@ return [
         'ignore_envs' => [
             'local',
         ],
+
+        /**
+         * The default priority of any tickets that are raised by the Jira error
+         * tracking application. This value should be 'as seen' in your Jira app
+         * when creating a new ticket.
+         */
+        'default_priority' => 'Critical',
+
+        /**
+         * The default type of any tickets that are raised by the Jira error
+         * tracking application. This value should be 'as seen' in your Jira app
+         * when creating a new ticket.
+         */
+        'default_type' => 'Alert',
+
+        /**
+         * The default person that any tickets raised by the Jira error tracking
+         * application will be assigned to. This value should be an exact match
+         * to the assignee select value in HTML source on your Jira app. You can
+         * leave this setting blank for tickets to be unassigned.
+         */
+        'default_assignee' => '',
     ],
 ];
