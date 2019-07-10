@@ -53,8 +53,8 @@ class AtlassianConnection
             'Content-Type: application/json'
         ];
 
-        $url = config('Jira.path');
-        $usrPassword = config('Jira.user.username') . ':' . config('Jira.user.password');
+        $url = config('laravel-jira.jira_path');;
+        $usrPassword = config('laravel-jira.jira_user') . ':' . config('laravel-jira.jira_key');
 
         if ($method == 'GET' && $data) {
             $path .= "?" . http_build_query($data);

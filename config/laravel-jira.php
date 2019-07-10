@@ -17,7 +17,13 @@ return [
      * The project prefix that tickets should be applied to in this project
      * instance
      */
-    'jira_project' => getenv('JIRA_PROJECT'),
+    'jira_project' => '',
+
+    /**
+     * The url of the Jira instance, this should be the full path before the
+     * api route, this is likely to be the same route across all projects
+     */
+    'jira_path' => '',
 
     /**
      * Configuration options specific to exception handling with Jira i.e.
