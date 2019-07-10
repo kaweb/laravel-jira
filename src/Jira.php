@@ -31,7 +31,7 @@ class Jira extends AtlassianConnection
      * @param  string $type        Issue type (Alert (default), Bug, etc.)
      * @param  string $assignee    User to which issue is to be assigned.
      *
-     * @return string JSON
+     * @return object
      */
     public function createIssue(
         string $summary,
@@ -40,7 +40,7 @@ class Jira extends AtlassianConnection
         string $priority,
         string $type,
         string $assignee
-    ):  string {
+    ): object {
         if (isset($_SERVER['argv'])) {
             $description .= "\n\nArguments:\n\n";
             foreach ($_SERVER['argv'] as $i => $arg) {
@@ -134,8 +134,7 @@ class Jira extends AtlassianConnection
             'fields' => ['key']
         ];
 
-        $responseJSON = $this->post('/rest/api/2/search', $data);
-        $responseObject = json_decode($responseJSON);
+        $responseObject = $this->post('/rest/api/2/search', $data);
 
         if (empty($responseObject->total)) {
             return null;
@@ -151,9 +150,9 @@ class Jira extends AtlassianConnection
      * @param  string $comment
      * @param  string $restrictionLevel
      *
-     * @return string JSON
+     * @return object
      */
-    public function addComment(string $issueKey, string $comment, string $restrictionLevel = null): string
+    public function addComment(string $issueKey, string $comment, string $restrictionLevel = null): object
     {
         $data = [
             'body' => $comment
