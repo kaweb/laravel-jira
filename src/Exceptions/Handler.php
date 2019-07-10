@@ -5,6 +5,7 @@ namespace Kaweb\Jira\Exceptions;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Console\DetectsApplicationNamespace;
+use Kaweb\Jira\Jira;
 
 class Handler extends ExceptionHandler
 {
@@ -37,6 +38,67 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        $env = getenv('APP_ENV');
+
+        if (!in_array($env, config('laravel-jira.exception_handling.ignore_envs'))) {
+            // Report to Jira
+            $backtrace = '';
+            $stacktrace = debug_backtrace(2);
+
+            // Get some config settings quickly
+            $project = config('laravel-jira.jira_project');
+            $type =  config('laravel-jira.exception_handling.default_type');
+            $priority =  config('laravel-jira.exception_handling.default_priority');
+            $assignee = config('laravel-jira.exception_handling.default_assignee', 'Unassigned');
+
+            foreach ($stacktrace as $trace) {
+                if (array_key_exists("file", $trace)) {
+                    $backtrace .= 'File: ' . $trace['file'] . ' - Line: ' . $trace['line'] . ' ';
+                    $backtrace .= 'Class: ' . $trace['class'] . ' Function: ' . $trace['function'] . ' ';
+                }
+            }
+
+            /**
+             * Build information for the description or body
+             */
+            $url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $body = <<<DESC
+h2. {color:red}Fatal Error Encountered{color}
+h4. {$exception->getMessage()}
+h4. Status Code: {$exception->getCode()}
+{{{$exception->getFile()} @ line {$exception->getLine()}}}
+---
+
+||URL||ENV||IPV4||
+|{$url}|{$env}|{$_SERVER['REMOTE_ADDR']}|
+---
+h2. Backtrace:
+{$backtrace}
+DESC;
+
+            $jira = new Jira;
+
+            // Search for existing issue
+            $issue = $jira->findIssueBySummary($exception->getMessage(), $project);
+
+            // If we have a ticket for this error already.
+            if (!empty($issue)) {
+                //Add a comment to the current ticket
+                $jira->addComment($issue, $body);
+            } else {
+                //If not create a new ticket
+                $jira->createIssue(
+                    'Fatal Error: ' . $exception->getMessage(),
+                    $body,
+                    $project,
+                    $priority,
+                    $type,
+                    $assignee
+                );
+            }
+        }
+
+        // Pass off to the default handler
         $className = $this->defaultHandler();
         if (!empty($className)) {
             $handler = new $className($this->container);
