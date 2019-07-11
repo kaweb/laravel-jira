@@ -1,5 +1,3 @@
-Readme in progress
-
 # Automatically raise errors as tickets in Jira
 
 This package will automatically create tickets in Jira or comment on existing tickets whenever an error has been caught within the Laravel application that it is installed in.
